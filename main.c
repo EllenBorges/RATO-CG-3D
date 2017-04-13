@@ -400,6 +400,15 @@ void desenha_Rato(){
             glColor3f(0.18,0.31,0.31);
             glutSolidTorus(2, 2, 50, 50);
         glPopMatrix();
+
+       /* glPushMatrix();
+            glRotatef(-45,0, 1 ,0);
+            glTranslatef(-15, 10, 0);
+            glScalef(2, 4 , 4);
+            glColor3f(0.98,0.5,0.45);
+            glutSolidSphere(2, 200, 200);
+        glPopMatrix();*;
+
      glPopMatrix();
 
 
@@ -553,13 +562,13 @@ void desenha_Rato(){
               /*desenha pata direita traseira*/
 
             glPushMatrix();
-                    glTranslatef(-15.0, -25, -40);
+                    glTranslatef(-17, -25, -40);
                     desenha_pata(angulo2);
             glPopMatrix();
 
               /*desenha pata esquerda traseira*/
              glPushMatrix();
-                    glTranslatef(15.0, -25, -40);
+                    glTranslatef(17, -25, -40);
                     desenha_pata(angulo1);
              glPopMatrix();
 
