@@ -28,7 +28,7 @@ GLfloat angle = 45;
 int flag1, flag2, gira, cor1, cor2, cor3;
 int width, heigth;
 float rX, rY, rZ, time;
-float elbow1 = 0, elbow2 = 0;
+float angulo1 = 0, angulo2 = 0;
 GLfloat fAspect;
 double tempo = 1.0;
 
@@ -284,7 +284,56 @@ void desenha_Queijo(){
 
 }
 
-void desenha_perna(){
+void desenha_pata(int angulo){
+
+	//glScalef (40.0,40.0,40.0);
+	glPushMatrix();
+		/* membro superior da pata */
+	//	glRotatef(angulo, 1, 0, 0);
+
+         glPushMatrix();
+            glRotatef(45,1,0,0);
+            glScalef(1.2, 2, 1.2);
+            glColor3f(0.18,0.31,0.31);
+            glutSolidSphere(5, 200.0, 200);
+         glPopMatrix();
+
+         /* membro do meio da pata */
+		// glRotatef(angulo, 1, 0, 0);
+         glPushMatrix();
+            glRotatef(-45,1,0,0);
+            glTranslatef(0,-8,-8);
+            glScalef(0.8, 2.0, 0.8);
+            glColor3f(0.18,0.31,0.31);
+            glutSolidSphere(5, 200.0, 200);
+         glPopMatrix();
+
+          /* extremidade da pata  */
+		// glRotatef(angulo, 1, 0, 0);
+         glPushMatrix();
+            glTranslatef(0,-16,7);
+            glScalef(0.7, 0.7, 1);
+            glColor3f(0.98,0.5,0.45);
+            glutSolidSphere(5, 200.0, 200);
+         glPopMatrix();
+
+		/* desenha e rotaciona a parte de baixo do braço */
+		/* origem posicionada no cotovelo
+		glPushMatrix();
+			glTranslatef(-0.2, 0.0, 0.0);
+			glTranslatef(0.1, 0.0, 0.0);
+			glRotatef(90, 0.0, 1.0, 0.0);
+			//glRotatef(angulo, 0.0, 0.0, 1.0);
+			glTranslatef(-0.1, 0.0, 0.0);
+			glPushMatrix();
+				glColor3f(0.5, 0.0, 0.0);
+				glScalef(2.0, 0.5, 0.5);
+				glutSolidCube(0.2);
+			glPopMatrix();*/
+
+
+	glPopMatrix();
+
 
 }
 
@@ -313,6 +362,7 @@ void desenha_Rato(){
 				glColor3f(0.18,0.31,0.31);
 				glutSolidSphere(15, 200, 200);
 			glPopMatrix();
+
 
 
 		glPopMatrix();
@@ -350,15 +400,6 @@ void desenha_Rato(){
             glColor3f(0.18,0.31,0.31);
             glutSolidTorus(2, 2, 50, 50);
         glPopMatrix();
-        /*
-         glPushMatrix();
-            glRotatef(-45,0, 1 ,0);
-            glTranslatef(-18, 8, 0);
-            glScalef(2.5, 2.5 , 2.5);
-            glColor3f(0.98,0.5,0.45);
-            glutSolidSphere(2, 50, 50);
-        glPopMatrix();*/
-
      glPopMatrix();
 
 
@@ -382,7 +423,7 @@ void desenha_Rato(){
         glPushMatrix();
             glTranslatef(0, -8, 30);
             glScalef(2, 2 , 2);
-            glColor3f(0.0, 0.0, 0.0);
+            glColor3f(0.98,0.5,0.45);
             glutSolidSphere(2.0, 100.0, 20);
         glPopMatrix();
      glPopMatrix();
@@ -428,8 +469,6 @@ void desenha_Rato(){
 				glPopMatrix();
 			glPopMatrix();
 		glPopMatrix();
-
-
 
 
     /*desenha bigode*/
@@ -488,12 +527,44 @@ void desenha_Rato(){
     glPushMatrix();
             glTranslatef(0, -22, -40);
             glRotatef(180,0,1,0);
-            glColor3f(0.18,0.31,0.31);
+            glColor3f(0.98,0.5,0.45);
             glutSolidCone(2,80,100,100);
 
     glPopMatrix();
 
-   /*desenha perna*/
+    /*chama funcao desenha_pata*/
+    glPushMatrix();
+
+           /*desenha pata direita da frente*/
+
+             glPushMatrix();
+                    glTranslatef(-10.0, -25, -10);
+                    desenha_pata(angulo1);
+            glPopMatrix();
+
+              /*desenha pata esquerda da frente*/
+
+             glPushMatrix();
+                    glTranslatef(10.0, -25, -10);
+
+                    desenha_pata(angulo2);
+            glPopMatrix();
+
+              /*desenha pata direita traseira*/
+
+            glPushMatrix();
+                    glTranslatef(-15.0, -25, -40);
+                    desenha_pata(angulo2);
+            glPopMatrix();
+
+              /*desenha pata esquerda traseira*/
+             glPushMatrix();
+                    glTranslatef(15.0, -25, -40);
+                    desenha_pata(angulo1);
+             glPopMatrix();
+
+        glPopMatrix();
+
 
 
     glPopMatrix();
@@ -508,7 +579,7 @@ void desenha(){
 	  glRotatef(rX, 1.0, 0.0, 0.0);
 	  glRotatef(rY, 0.0, 1.0, 0.0);
 	  glRotatef(rZ, 0.0, 0.0, 1.0);
-	  	  desenha_Rato(elbow1);
+	  	  desenha_Rato(angulo1);
 
 	glPopMatrix();
 	//chamar a desenha queijo
@@ -527,8 +598,60 @@ void timer(int i){
 
 
 void controla_Rato(){
-/*rotação*/
-/*translação*/
+    if(angulo1 < 25 && flag1 == 1) angulo1 += 0.7;
+	else{
+		if(angulo1 > -15 && flag1 == 0) angulo1 -= 0.7;
+		else{
+			if(angulo1 <= -15 && flag1 == 0) flag1 = 1;
+			else if(angulo1 >= 25 && flag1 == 1) flag1 = 0;
+		}
+	}
+
+	if(angulo2 < 15 && flag2 == 1) angulo2 += 0.7;
+	else{
+		if(angulo2 > -25 && flag2 == 0) angulo2 -= 0.7;
+		else{
+			if(angulo2 <= -25 && flag2 == 0) flag2 = 1;
+			else if(angulo2 >= 15 && flag2 == 1) flag2 = 0;
+		}
+	}
+
+
+
+	if(tempo == 0.f) printf("Tempo: %f\n", tempo);
+
+	tempo -= 0.0005;
+
+/*	if(X > width - 12){ // Parede direita*/
+/*		if(dY < 0) ang1 = 0.2; // Calculo da rotação do cubo*/
+/*		if(dY > 0) ang1 = -0.2;*/
+/*		dX = -dX;*/
+/*		gira = 180;*/
+/*	}*/
+/*	if(X < -width + 12){ // Parede esquerda*/
+/*		if(dY < 0) ang1 = -0.2;*/
+/*		if(dY > 0) ang1 = 0.2;*/
+/*		dX = -dX;*/
+/*		gira = 0;*/
+/*	}*/
+/*	if(Y > heigth - 12){ // Topo*/
+/*		if(dX > 0) ang1 = 0.2;*/
+/*		if(dX < 0) ang1 = -0.2;*/
+/*		gira = -180;*/
+/*		dY = -dY;*/
+/*	}*/
+/*	if(Y < -heigth + 12){ // Base*/
+/*		if(dX > 0) ang1 = -0.2;*/
+/*		if(dX < 0) ang1 = 0.2;*/
+/*		gira = 0;*/
+/*		dY = -dY;*/
+/*	}*/
+
+/*	X += dX;*/
+/*	Y += dY;*/
+/*	spin1 += ang1;*/
+
+	glutPostRedisplay();
 
 
 
@@ -619,7 +742,7 @@ void MouseInt (int botao, int estado, int x, int y){
         //    y_novoQueijo = (float) 1 -(float) y/(altura_Janela/2.0);
 
             InsereNO(listaQueijo,x_novoQueijo,y_novoQueijo);
-            controla_Rato();
+            //controla_Rato();
 
 
         }
@@ -666,8 +789,8 @@ int main(int argc, char *argv[]){
     glutSpecialFunc(SpecialKeys);
     glutMouseFunc(MouseInt);
 
-//glutIdleFunc(controla_Rato);
-	//glutTimerFunc(time, timer, 1);
+    glutIdleFunc(controla_Rato);
+	glutTimerFunc(time, timer, 1);
     glutReshapeFunc(reshape);
     SetupRC();
 
