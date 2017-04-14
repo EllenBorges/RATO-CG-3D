@@ -28,7 +28,7 @@ GLfloat angle = 45;
 int flag1, flag2, gira;
 int width, heigth;
 float rX, rY, rZ, time;
-float eMais=1, eMenos=1;
+float eMais=1.0, eMenos=1.0;
 float angulo1 = 0, angulo2 = 0;
 GLfloat fAspect;
 double tempo = 1.0;
@@ -37,6 +37,7 @@ float ymax;
 float zmax;
 float largura_Janela = 800;
 float altura_Janela = 600;
+int cont = 0;
 
 
 
@@ -123,12 +124,6 @@ void Imprime_ListaQueijo(){
     if(listaQueijo!=NULL && listaQueijo->tamanho>0)
         lst_imprime(listaQueijo->primeiro);
 }
-
-
-
-
-
-
 
 
 /*------------------------FUNÇÕES DE INICIALIZAÇÃO---------------------*/
@@ -268,25 +263,94 @@ void cor_Corrente(char nome_cor[]){
         glColor3f(1,0.84,0);
 
 }
+/*---------------------- FUNCOES DE INTERACAO---------------------------*/
+
+
+void keyboard (unsigned char key, int x, int y){
+    switch(key){
+        case 'E':
+            /*faz com que o rato aumente seu tamanho*/
+            if(eMais<3)eMais+=0.08;
+            break;
+        case 'e':
+            /*faz com que o rato diminua seu tamanho*/
+            if(eMenos>0) eMenos-=0.08;
+
+            break;
+        case 'X':
+            /*faz com que o rato rotacione no eixo x */
+            rX -= 5; break;
+
+            break;
+	 case 'x':
+            /*faz com que o rato rotacione no eixo x */
+            rX += 5; break;
+	    break;
+
+        case 'Y':
+            /*faz com que o rato rotacione no eixo y */
+            rY -= 5; break;
+
+            break;
+	 case 'y':
+            /*faz com que o rato rotacione no eixo y */
+             rY += 5; break;
+	    break;
+
+        case 'Z':
+            /*faz com que o rato rotacione no eixo z */
+            rZ -= 5; break;
+            break;
+	 case 'z':
+            /*faz com que o rato rotacione no eixo z */
+            rZ += 5; break;
+	    break;
+
+        case 27:
+            exit(0);
+            break;
+        default:
+            break;
+
+    }
+    glutPostRedisplay();
+}
+
+void MouseInt (int botao, int estado, int x, int y){
+    switch(botao){
+    case GLUT_LEFT_BUTTON:
+        if(estado == GLUT_DOWN){
+                cont++;
+
+                x_novoQueijo = (((float)x/((float)largura_Janela/2.0))-1.0)*100;
+
+                y_novoQueijo = ((float) 1 -(float) y/(altura_Janela/2.0))*100;
+                z_novoQueijo = 0;
+
+                InsereNO(listaQueijo,x_novoQueijo,y_novoQueijo,z_novoQueijo);
+
+        }
+        break;
+    }
+    glutPostRedisplay();
+}
 
 /*---------------------- FUNCOES DE DESENHO---------------------------*/
 
 /*-----------------------Desenha Queijo-----------------------*/
 void desenha_Queijo(){
 
-    glPushMatrix();
+    if(cont>0){
+        glPushMatrix();
 
-         glPushMatrix();
-            glScalef(1.5, 1.5, 1.5);
-            cor_Corrente("ouro");
-            glutSolidCube(5);
-         glPopMatrix();
+             glPushMatrix();
+                glScalef(1.5, 1.5, 1.5);
+                glColor3f(1,0.84,0);
+                glutSolidCube(5);
+             glPopMatrix();
 
-    glPopMatrix();
-
-
-
-
+        glPopMatrix();
+    }
 
 }
 /*-----------------------Desenha Rato-----------------------*/
@@ -391,14 +455,6 @@ void desenha_Rato(){
             glColor3f(0.18,0.31,0.31);
             glutSolidTorus(2, 2, 50, 50);
         glPopMatrix();
-
-       /* glPushMatrix();
-            glRotatef(-45,0, 1 ,0);
-            glTranslatef(-15, 10, 0);
-            glScalef(2, 4 , 4);
-            glColor3f(0.98,0.5,0.45);
-            glutSolidSphere(2, 200, 200);
-        glPopMatrix();*;
 
      glPopMatrix();
 
@@ -579,9 +635,12 @@ void desenha(){
     glPopMatrix();
 
 	glPushMatrix();
+
 	  glRotatef(rX, 1.0, 0.0, 0.0);
 	  glRotatef(rY, 0.0, 1.0, 0.0);
 	  glRotatef(rZ, 0.0, 0.0, 1.0);
+      glScalef(eMais,eMais,eMais);
+	  glScalef(eMenos,eMenos,eMenos);
 	  desenha_Rato(angulo1);
 	glPopMatrix();
 
@@ -621,38 +680,27 @@ void animacao(){
 	if(tempo == 0.f) printf("Tempo: %f\n", tempo);
         tempo -= 0.0005;
 
-/*	if(X > width - 12){ // Parede direita*/
-/*		if(dY < 0) ang1 = 0.2; // Calculo da rotação do cubo*/
-/*		if(dY > 0) ang1 = -0.2;*/
-/*		dX = -dX;*/
-/*		gira = 180;*/
-/*	}*/
-/*	if(X < -width + 12){ // Parede esquerda*/
-/*		if(dY < 0) ang1 = -0.2;*/
-/*		if(dY > 0) ang1 = 0.2;*/
-/*		dX = -dX;*/
-/*		gira = 0;*/
-/*	}*/
-/*	if(Y > heigth - 12){ // Topo*/
-/*		if(dX > 0) ang1 = 0.2;*/
-/*		if(dX < 0) ang1 = -0.2;*/
-/*		gira = -180;*/
-/*		dY = -dY;*/
-/*	}*/
-/*	if(Y < -heigth + 12){ // Base*/
-/*		if(dX > 0) ang1 = -0.2;*/
-/*		if(dX < 0) ang1 = 0.2;*/
-/*		gira = 0;*/
-/*		dY = -dY;*/
-/*	}*/
 
-/*	X += dX;*/
-/*	Y += dY;*/
-/*	spin1 += ang1;*/
+    /*translacao e rotacao do rato ate o queijo
+
+    GLfloat i;
+    if(listaQueijo!=NULL){
+       NO* p;
+        p = listaQueijo->primeiro;
+
+
+        while(p!=NULL){
 
 
 
 
+           p = p->prox;
+
+         }
+        }
+
+
+*/
 
 
 	glutPostRedisplay();
@@ -666,102 +714,6 @@ void timer(int i){
 }
 
 
-/*---------------------- FUNCOES DE INTERACAO---------------------------*/
-
-void SpecialKeys (int key, int x, int y){
-    switch (key){
-        case GLUT_KEY_UP:
-
-
-            break;
-        case GLUT_KEY_DOWN:
-
-            break;
-
-        case GLUT_KEY_LEFT :
-
-            break ;
-        case GLUT_KEY_RIGHT :
-
-            break ;
-        default :
-            break ;
-        }
-        glutPostRedisplay() ;
-}
-
-void keyboard (unsigned char key, int x, int y){
-    switch(key){
-        case 'E':
-            /*faz com que o rato aumente seu tamanho*/
-            glScalef(1.25,1.25,1.25);
-            break;
-        case 'e':
-            /*faz com que o rato diminua seu tamanho*/
-            glScalef(0.25,0.25,0.25);
-
-            break;
-        case 'X':
-            /*faz com que o rato rotacione no eixo x */
-            rX -= 5; break;
-
-            break;
-	 case 'x':
-            /*faz com que o rato rotacione no eixo x */
-            rX += 5; break;
-	    break;
-
-        case 'Y':
-            /*faz com que o rato rotacione no eixo y */
-            rY -= 5; break;
-
-            break;
-	 case 'y':
-            /*faz com que o rato rotacione no eixo y */
-             rY += 5; break;
-	    break;
-
-        case 'Z':
-            /*faz com que o rato rotacione no eixo z */
-            rZ -= 5; break;
-            break;
-	 case 'z':
-            /*faz com que o rato rotacione no eixo z */
-            rZ += 5; break;
-	    break;
-
-        case 27:
-            exit(0);
-            break;
-        default:
-            break;
-
-    }
-    glutPostRedisplay();
-}
-
-void MouseInt (int botao, int estado, int x, int y){
-    switch(botao){
-    case GLUT_LEFT_BUTTON:
-        if(estado == GLUT_DOWN){
-
-            x_novoQueijo = (((float)x/((float)largura_Janela/2.0))-1.0)*100;
-
-            y_novoQueijo = ((float) 1 -(float) y/(altura_Janela/2.0))*100;
-            z_novoQueijo = 0;
-
-             printf("\n X = %.2f\n",x_novoQueijo);
-             printf("\n Y = %.2f\n",y_novoQueijo);
-             printf("\n Z = %.2f\n",z_novoQueijo);
-
-            InsereNO(listaQueijo,x_novoQueijo,y_novoQueijo,z_novoQueijo);
-
-
-        }
-        break;
-    }
-    glutPostRedisplay();
-}
 
 void reshape (int w, int h)
 {
@@ -804,7 +756,6 @@ int main(int argc, char *argv[]){
     glutDisplayFunc(desenha);
 
     glutKeyboardFunc(keyboard);
-    glutSpecialFunc(SpecialKeys);
     glutMouseFunc(MouseInt);
 
     glutIdleFunc(animacao);
@@ -818,4 +769,3 @@ int main(int argc, char *argv[]){
 
 return 0;
 }
-
