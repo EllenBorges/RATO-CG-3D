@@ -22,22 +22,28 @@ Quando o rato se aproxima do queijo, o queijo some da tela.
 /*------------------------VARIAVEIS--------------------------------*/
 
 
-float x_novoQueijo, y_novoQueijo;
+float x_novoQueijo, y_novoQueijo,z_novoQueijo;
 
 GLfloat angle = 45;
-int flag1, flag2, gira, cor1, cor2, cor3;
+int flag1, flag2, gira;
 int width, heigth;
 float rX, rY, rZ, time;
+float eMais=1, eMenos=1;
 float angulo1 = 0, angulo2 = 0;
 GLfloat fAspect;
 double tempo = 1.0;
+float xmax;
+float ymax;
+float zmax;
+float largura_Janela = 800;
+float altura_Janela = 600;
 
 
 
 
 /*------------------ESTRUTURA DA LISTA-----------------------------*/
 typedef struct no_lista{
-  float x, y;
+  float x, y,z;
   struct no_lista *prox;
 }NO;
 
@@ -60,12 +66,13 @@ void InicializaLista(LDE *L){
 }
 
 /*insere um novo no no final da lista*/
-void InsereNO(LDE *L, float x,float y){
+void InsereNO(LDE *L, float x,float y,float z){
 
     NO *novo = (NO*)malloc(sizeof(NO));
     novo->prox = NULL;
     novo->x = x;
     novo->y = y;
+    novo->z = z;
 
 
     if(L->primeiro==NULL && L->ultimo==NULL){
@@ -107,7 +114,7 @@ void lst_imprime (NO* lst){
     NO* p;
 
     for (p = lst; p != NULL; p = p->prox)
-        printf("X_Queijo = [%.2f] \n Y_Queijo = [%.2f] \n", p->x, p->y);
+        printf("X_Queijo = [%.2f] \n Y_Queijo = [%.2f]  \n Z_Queijo = [%.2f]\n", p->x, p->y,p->z);
 
 
 }
@@ -132,12 +139,7 @@ void inicializa_Tela(char nome_janela[]){
     glutInitWindowSize(DEFAULT_WINDOW_SIZE_W, DEFAULT_WINDOW_SIZE_H);
 
     glutCreateWindow(nome_janela);
-   /* glClearColor(255,255,255,255);
-    glClear(GL_COLOR_BUFFER_BIT);
 
-    glMatrixMode(GL_PROJECTION);
-    gluOrtho2D(-1.0,1.0,-1.0,1.0);
-    glMatrixMode(GL_MODELVIEW);*/
     glFinish();
 
 }
@@ -146,14 +148,19 @@ void inicializa_Variaveis(){
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   flag1 = 1;
   flag2 = 1;
-  cor1 = 1;
-  cor2 = 0;
-  cor3 = 0;
   time = 1.0;
   rX = 0.0;
   rY = 0.0;
   rZ = 0.0;
   gira = 0;
+  eMais= 1;
+  eMenos = 1;
+  ymax = -16;
+  x_novoQueijo = 0;
+  y_novoQueijo = 0;
+  z_novoQueijo = 0;
+  altura_Janela = DEFAULT_WINDOW_SIZE_H;
+  largura_Janela = DEFAULT_WINDOW_SIZE_W;
 
 
 }
@@ -171,7 +178,7 @@ void SetupRC(void) {
 
 	/* Capacidade de brilho do material */
     GLfloat especularidade[4]={1.0, 1.0, 1.0, 1.0};
-    GLint especMaterial = 20;
+    GLint especMaterial = 80;
 
 
 /* Especifica que a cor de fundo da janela será preta */
@@ -226,7 +233,7 @@ void Viewing(void)	{
 	glLoadIdentity();
 
 	/* Especifica posição do observador e do alvo */
-	gluLookAt(0, 20, 200, 0, 0, 0, 0, 1, 0);
+	gluLookAt(-130,150, 150, 0, 0, 0, 0, 1, 0);
 }
 /*------------------------FUNÇÕES ADICIONAIS ---------------------*/
 void cor_Corrente(char nome_cor[]){
@@ -262,35 +269,34 @@ void cor_Corrente(char nome_cor[]){
 
 }
 
-
-/*---------------------- FUNCOES DE TRANSFORMAÇÃO---------------------------*/
-
-void translada_Rato(){
-}
-
-void rotaciona_Rato(){
-}
-
-void escala_Rato(){
-
-}
-
-
 /*---------------------- FUNCOES DE DESENHO---------------------------*/
-void desenha_Queijo(){
+
 /*-----------------------Desenha Queijo-----------------------*/
+void desenha_Queijo(){
+
+    glPushMatrix();
+
+         glPushMatrix();
+            glScalef(1.5, 1.5, 1.5);
+            cor_Corrente("ouro");
+            glutSolidCube(5);
+         glPopMatrix();
+
+    glPopMatrix();
+
+
 
 
 
 }
-
+/*-----------------------Desenha Rato-----------------------*/
 void desenha_pata(int angulo){
 
 	//glScalef (40.0,40.0,40.0);
 	glPushMatrix();
 		/* membro superior da pata */
-	//	glRotatef(angulo, 1, 0, 0);
 
+         glRotatef(angulo, 1, 0, 0);
          glPushMatrix();
             glRotatef(45,1,0,0);
             glScalef(1.2, 2, 1.2);
@@ -299,7 +305,7 @@ void desenha_pata(int angulo){
          glPopMatrix();
 
          /* membro do meio da pata */
-		// glRotatef(angulo, 1, 0, 0);
+		 glRotatef(angulo, 1, 0, 0);
          glPushMatrix();
             glRotatef(-45,1,0,0);
             glTranslatef(0,-8,-8);
@@ -308,29 +314,14 @@ void desenha_pata(int angulo){
             glutSolidSphere(5, 200.0, 200);
          glPopMatrix();
 
+
           /* extremidade da pata  */
-		// glRotatef(angulo, 1, 0, 0);
          glPushMatrix();
             glTranslatef(0,-16,7);
             glScalef(0.7, 0.7, 1);
             glColor3f(0.98,0.5,0.45);
             glutSolidSphere(5, 200.0, 200);
          glPopMatrix();
-
-		/* desenha e rotaciona a parte de baixo do braço */
-		/* origem posicionada no cotovelo
-		glPushMatrix();
-			glTranslatef(-0.2, 0.0, 0.0);
-			glTranslatef(0.1, 0.0, 0.0);
-			glRotatef(90, 0.0, 1.0, 0.0);
-			//glRotatef(angulo, 0.0, 0.0, 1.0);
-			glTranslatef(-0.1, 0.0, 0.0);
-			glPushMatrix();
-				glColor3f(0.5, 0.0, 0.0);
-				glScalef(2.0, 0.5, 0.5);
-				glutSolidCube(0.2);
-			glPopMatrix();*/
-
 
 	glPopMatrix();
 
@@ -547,29 +538,28 @@ void desenha_Rato(){
            /*desenha pata direita da frente*/
 
              glPushMatrix();
-                    glTranslatef(-10.0, -25, -10);
-                    desenha_pata(angulo1);
-            glPopMatrix();
+                glTranslatef(-10.0, -25, -10);
+                desenha_pata(angulo1);
+             glPopMatrix();
 
               /*desenha pata esquerda da frente*/
 
              glPushMatrix();
-                    glTranslatef(10.0, -25, -10);
-
-                    desenha_pata(angulo2);
+                glTranslatef(10.0, -25, -10);
+                desenha_pata(angulo2);
             glPopMatrix();
 
               /*desenha pata direita traseira*/
 
             glPushMatrix();
-                    glTranslatef(-17, -25, -40);
-                    desenha_pata(angulo2);
+                glTranslatef(-17, -25, -40);
+                desenha_pata(angulo2);
             glPopMatrix();
 
               /*desenha pata esquerda traseira*/
              glPushMatrix();
-                    glTranslatef(17, -25, -40);
-                    desenha_pata(angulo1);
+                glTranslatef(17, -25, -40);
+                desenha_pata(angulo1);
              glPopMatrix();
 
         glPopMatrix();
@@ -583,30 +573,31 @@ void desenha_Rato(){
 void desenha(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
+    glPushMatrix();
+        glTranslatef(x_novoQueijo,y_novoQueijo,z_novoQueijo);
+        desenha_Queijo();
+    glPopMatrix();
 
 	glPushMatrix();
 	  glRotatef(rX, 1.0, 0.0, 0.0);
 	  glRotatef(rY, 0.0, 1.0, 0.0);
 	  glRotatef(rZ, 0.0, 0.0, 1.0);
-	  	  desenha_Rato(angulo1);
-
+	  desenha_Rato(angulo1);
 	glPopMatrix();
+
 	//chamar a desenha queijo
     glutSwapBuffers();
 
 
 }
 
-void timer(int i){
-	glutPostRedisplay();
-	glutTimerFunc(time, timer, 1);
-}
+
 
 /*------------------FUNÇÕES DE MOVIMENTACAO DO RATO----------------------*/
 
 
 
-void controla_Rato(){
+void animacao(){
     if(angulo1 < 25 && flag1 == 1) angulo1 += 0.7;
 	else{
 		if(angulo1 > -15 && flag1 == 0) angulo1 -= 0.7;
@@ -628,8 +619,7 @@ void controla_Rato(){
 
 
 	if(tempo == 0.f) printf("Tempo: %f\n", tempo);
-
-	tempo -= 0.0005;
+        tempo -= 0.0005;
 
 /*	if(X > width - 12){ // Parede direita*/
 /*		if(dY < 0) ang1 = 0.2; // Calculo da rotação do cubo*/
@@ -660,12 +650,20 @@ void controla_Rato(){
 /*	Y += dY;*/
 /*	spin1 += ang1;*/
 
+
+
+
+
+
 	glutPostRedisplay();
 
 
 
 }
-
+void timer(int i){
+	glutPostRedisplay();
+	glutTimerFunc(time, timer, 1);
+}
 
 
 /*---------------------- FUNCOES DE INTERACAO---------------------------*/
@@ -673,6 +671,7 @@ void controla_Rato(){
 void SpecialKeys (int key, int x, int y){
     switch (key){
         case GLUT_KEY_UP:
+
 
             break;
         case GLUT_KEY_DOWN:
@@ -695,11 +694,11 @@ void keyboard (unsigned char key, int x, int y){
     switch(key){
         case 'E':
             /*faz com que o rato aumente seu tamanho*/
-
-
+            glScalef(1.25,1.25,1.25);
             break;
         case 'e':
             /*faz com que o rato diminua seu tamanho*/
+            glScalef(0.25,0.25,0.25);
 
             break;
         case 'X':
@@ -746,12 +745,16 @@ void MouseInt (int botao, int estado, int x, int y){
     case GLUT_LEFT_BUTTON:
         if(estado == GLUT_DOWN){
 
-//            x_novoQueijo = ((float)x/((float)largura_Janela/2.0))-1.0;
+            x_novoQueijo = (((float)x/((float)largura_Janela/2.0))-1.0)*100;
 
-        //    y_novoQueijo = (float) 1 -(float) y/(altura_Janela/2.0);
+            y_novoQueijo = ((float) 1 -(float) y/(altura_Janela/2.0))*100;
+            z_novoQueijo = 0;
 
-            InsereNO(listaQueijo,x_novoQueijo,y_novoQueijo);
-            //controla_Rato();
+             printf("\n X = %.2f\n",x_novoQueijo);
+             printf("\n Y = %.2f\n",y_novoQueijo);
+             printf("\n Z = %.2f\n",z_novoQueijo);
+
+            InsereNO(listaQueijo,x_novoQueijo,y_novoQueijo,z_novoQueijo);
 
 
         }
@@ -780,6 +783,10 @@ void reshape (int w, int h)
 	/* Calcula a correção de aspecto */
 	fAspect = (GLfloat)w / (GLfloat)h;
 
+	/*atualiza variaveis*/
+	largura_Janela = w;
+	altura_Janela = h;
+
 	Viewing();
 
 }
@@ -787,9 +794,11 @@ void reshape (int w, int h)
 int main(int argc, char *argv[]){
 
     glutInit (&argc,argv);
+    inicializa_Variaveis();
 
     listaQueijo = (LDE*) malloc(sizeof(LDE));
     InicializaLista(listaQueijo);
+
 
     inicializa_Tela("RUN MOUSE");
     glutDisplayFunc(desenha);
@@ -798,7 +807,7 @@ int main(int argc, char *argv[]){
     glutSpecialFunc(SpecialKeys);
     glutMouseFunc(MouseInt);
 
-    glutIdleFunc(controla_Rato);
+    glutIdleFunc(animacao);
 	glutTimerFunc(time, timer, 1);
     glutReshapeFunc(reshape);
     SetupRC();
